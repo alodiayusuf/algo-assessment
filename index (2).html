@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Penilaian Algoritma & Pemrograman</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/rough.js/4.6.6/rough.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0f1117;
+      --bg2: #161922;
+      --bg3: #1e2230;
+      --border: rgba(255,255,255,0.08);
+      --border2: rgba(255,255,255,0.15);
+      --text: #f0f2f8;
+      --text2: #8b92a8;
+      --accent: #6c7bff;
+      --accent2: #4facfe;
+      --success: #34d399;
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+
+    /* Layout */
+    .app { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: 260px; flex-shrink: 0;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      padding: 2rem 1.5rem;
+      display: flex; flex-direction: column; gap: 0.5rem;
+    }
+    .main { flex: 1; padding: 2rem; overflow-y: auto; }
+
+    /* Sidebar nav */
+    .logo { font-size: 18px; font-weight: 700; margin-bottom: 1.5rem; color: var(--text); }
+    .logo span { color: var(--accent); }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: var(--radius-sm);
+      cursor: pointer; font-size: 14px; font-weight: 500;
+      color: var(--text2); transition: all 0.15s; border: none; background: none; width: 100%; text-align: left;
+    }
+    .nav-item:hover { background: var(--bg3); color: var(--text); }
+    .nav-item.active { background: rgba(108,123,255,0.15); color: var(--accent); }
+    .nav-icon { width: 18px; height: 18px; flex-shrink: 0; }
+    .nav-section { font-size: 11px; font-weight: 600; color: var(--text2); letter-spacing: 0.08em; text-transform: uppercase; padding: 1rem 12px 0.5rem; }
+
+    /* Cards */
+    .card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.5rem;
+    }
+    .card-title { font-size: 16px; font-weight: 600; margin-bottom: 1rem; }
+
+    /* Form */
+    label { font-size: 13px; font-weight: 500; color: var(--text2); display: block; margin-bottom: 6px; }
+    input, select, textarea {
+      width: 100%; background: var(--bg3); border: 1px solid var(--border2);
+      border-radius: var(--radius-sm); padding: 10px 12px; color: var(--text);
+      font-family: inherit; font-size: 14px; outline: none; transition: border-color 0.15s;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+    textarea { resize: vertical; min-height: 120px; }
+    .code-input {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px; min-height: 200px; line-height: 1.6;
+    }
+    .form-group { margin-bottom: 1.25rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 20px; border-radius: var(--radius-sm);
+      font-family: inherit; font-size: 14px; font-weight: 600;
+      cursor: pointer; border: none; transition: all 0.15s;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #5a6aee; }
+    .btn-secondary { background: var(--bg3); color: var(--text); border: 1px solid var(--border2); }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-success { background: rgba(52,211,153,0.15); color: var(--success); border: 1px solid rgba(52,211,153,0.3); }
+    .btn-danger { background: rgba(248,113,113,0.15); color: var(--danger); border: 1px solid rgba(248,113,113,0.3); }
+    .btn-lg { padding: 14px 28px; font-size: 16px; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Badge */
+    .badge {
+      display: inline-block; padding: 3px 10px; border-radius: 20px;
+      font-size: 12px; font-weight: 600;
+    }
+    .badge-blue { background: rgba(108,123,255,0.15); color: var(--accent); }
+    .badge-green { background: rgba(52,211,153,0.15); color: var(--success); }
+    .badge-yellow { background: rgba(251,191,36,0.15); color: var(--warning); }
+    .badge-red { background: rgba(248,113,113,0.15); color: var(--danger); }
+
+    /* Score ring */
+    .score-ring { position: relative; display: inline-flex; align-items: center; justify-content: center; }
+    .score-ring svg { transform: rotate(-90deg); }
+    .score-ring .score-text { position: absolute; text-align: center; }
+    .score-text .num { font-size: 28px; font-weight: 700; }
+    .score-text .lbl { font-size: 11px; color: var(--text2); }
+
+    /* Flowchart canvas */
+    .canvas-wrap { position: relative; border: 1px solid var(--border2); border-radius: var(--radius-sm); overflow: hidden; }
+    .fc-canvas { display: block; background: #0d1018; cursor: crosshair; width: 100%; }
+    .fc-toolbar {
+      display: flex; gap: 8px; padding: 10px;
+      background: var(--bg3); border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .fc-tool {
+      padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 500;
+      cursor: pointer; border: 1px solid var(--border2); background: var(--bg2);
+      color: var(--text2); transition: all 0.15s;
+    }
+    .fc-tool.active { border-color: var(--accent); color: var(--accent); background: rgba(108,123,255,0.1); }
+    .fc-tool:hover { border-color: var(--border2); color: var(--text); }
+
+    /* Divider */
+    .divider { height: 1px; background: var(--border); margin: 1.5rem 0; }
+
+    /* Grid */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+
+    /* Result section */
+    .qa-item { background: var(--bg3); border-radius: var(--radius-sm); padding: 1.25rem; margin-bottom: 1rem; }
+    .qa-q { font-size: 14px; font-weight: 600; color: var(--accent2); margin-bottom: 0.75rem; }
+    .qa-a { font-size: 14px; color: var(--text2); line-height: 1.6; }
+
+    /* Spinner */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      width: 20px; height: 20px; border: 2px solid var(--border2);
+      border-top-color: var(--accent); border-radius: 50%;
+      animation: spin 0.8s linear infinite; flex-shrink: 0;
+    }
+
+    /* Undi animation */
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25% { transform: translateX(-4px) rotate(-1deg); }
+      75% { transform: translateX(4px) rotate(1deg); }
+    }
+    .shake { animation: shake 0.5s ease infinite; }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: var(--bg2); border: 1px solid var(--border2);
+      border-radius: var(--radius); padding: 12px 20px;
+      font-size: 14px; font-weight: 500; z-index: 999;
+      animation: fadeIn 0.2s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Tabs */
+    .tabs { display: flex; gap: 4px; background: var(--bg3); padding: 4px; border-radius: var(--radius-sm); margin-bottom: 1.5rem; }
+    .tab {
+      flex: 1; padding: 8px; text-align: center; border-radius: 6px;
+      font-size: 13px; font-weight: 500; cursor: pointer; color: var(--text2);
+      transition: all 0.15s; border: none; background: none;
+    }
+    .tab.active { background: var(--bg2); color: var(--text); }
+
+    /* Member chip */
+    .member-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 12px; border-radius: 20px;
+      background: var(--bg3); border: 1px solid var(--border2);
+      font-size: 13px; font-weight: 500;
+    }
+    .member-chip.winner { border-color: var(--warning); background: rgba(251,191,36,0.1); color: var(--warning); }
+
+    /* Table */
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th { text-align: left; padding: 10px 12px; font-size: 12px; font-weight: 600; color: var(--text2); border-bottom: 1px solid var(--border); text-transform: uppercase; letter-spacing: 0.05em; }
+    td { padding: 12px; border-bottom: 1px solid var(--border); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+    .section-header { margin-bottom: 1.5rem; }
+    .section-title { font-size: 22px; font-weight: 700; }
+    .section-sub { font-size: 14px; color: var(--text2); margin-top: 4px; }
+
+    .empty-state { text-align: center; padding: 3rem 1rem; color: var(--text2); }
+    .empty-icon { font-size: 40px; margin-bottom: 1rem; }
+
+    .info-box { background: rgba(108,123,255,0.08); border: 1px solid rgba(108,123,255,0.2); border-radius: var(--radius-sm); padding: 1rem; font-size: 13px; color: var(--text2); margin-bottom: 1rem; }
+    .info-box strong { color: var(--accent); }
+
+    /* Step indicator */
+    .steps { display: flex; gap: 0; margin-bottom: 2rem; }
+    .step { flex: 1; text-align: center; position: relative; }
+    .step::after { content: ''; position: absolute; top: 14px; left: 50%; right: -50%; height: 2px; background: var(--border); z-index: 0; }
+    .step:last-child::after { display: none; }
+    .step-dot { width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; position: relative; z-index: 1; margin-bottom: 6px; }
+    .step-dot.done { background: var(--success); color: #000; }
+    .step-dot.active { background: var(--accent); color: #fff; }
+    .step-dot.pending { background: var(--bg3); color: var(--text2); border: 1px solid var(--border2); }
+    .step-label { font-size: 11px; color: var(--text2); }
+    .step.active .step-label { color: var(--accent); }
+
+    /* Config page */
+    .config-hint { font-size: 12px; color: var(--text2); margin-top: 6px; line-height: 1.5; }
+    .config-hint code { font-family: 'JetBrains Mono', monospace; background: var(--bg3); padding: 1px 5px; border-radius: 4px; font-size: 11px; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect, useRef, useCallback } = React;
+
+    // ─── Supabase tiny client ───────────────────────────────────────────────
+    function supabase(url, key) {
+      const headers = { 'apikey': key, 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
+      return {
+        from: (table) => ({
+          select: (cols='*') => fetch(`${url}/rest/v1/${table}?select=${cols}`, { headers }).then(r => r.json()),
+          insert: (data) => fetch(`${url}/rest/v1/${table}`, { method: 'POST', headers, body: JSON.stringify(data) }).then(r => r.json()),
+          update: (data) => ({
+            eq: (col, val) => fetch(`${url}/rest/v1/${table}?${col}=eq.${val}`, { method: 'PATCH', headers, body: JSON.stringify(data) }).then(r => r.json())
+          }),
+          delete: () => ({
+            eq: (col, val) => fetch(`${url}/rest/v1/${table}?${col}=eq.${val}`, { method: 'DELETE', headers }).then(r => r.json())
+          }),
+        })
+      };
+    }
+
+    // ─── Config storage ─────────────────────────────────────────────────────
+    function getConfig() {
+      try { return JSON.parse(localStorage.getItem('algo_config') || '{}'); } catch { return {}; }
+    }
+    function saveConfig(c) { localStorage.setItem('algo_config', JSON.stringify(c)); }
+
+    // ─── Flowchart Editor ───────────────────────────────────────────────────
+    function FlowchartEditor({ value, onChange }) {
+      const canvasRef = useRef(null);
+      const [tool, setTool] = useState('rect'); // rect, diamond, text, arrow, select, erase
+      const [shapes, setShapes] = useState([]);
+      const [drawing, setDrawing] = useState(false);
+      const [startPos, setStartPos] = useState(null);
+      const [selectedId, setSelectedId] = useState(null);
+      const [editingId, setEditingId] = useState(null);
+      const [editText, setEditText] = useState('');
+      const [arrowStart, setArrowStart] = useState(null);
+      const idRef = useRef(0);
+
+      useEffect(() => {
+        if (value && value.length) setShapes(value);
+      }, []);
+
+      useEffect(() => {
+        onChange && onChange(shapes);
+        draw();
+      }, [shapes, selectedId, editingId]);
+
+      function getPos(e) {
+        const canvas = canvasRef.current;
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        return {
+          x: (e.clientX - rect.left) * scaleX,
+          y: (e.clientY - rect.top) * scaleY
+        };
+      }
+
+      function draw() {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Grid
+        ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+        ctx.lineWidth = 1;
+        for (let x = 0; x < canvas.width; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke(); }
+        for (let y = 0; y < canvas.height; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke(); }
+
+        shapes.forEach(s => {
+          ctx.save();
+          const isSelected = s.id === selectedId;
+          if (['rect','diamond','oval','parallelogram','declaration'].includes(s.type)) {
+            ctx.strokeStyle = isSelected ? '#6c7bff' : '#4facfe';
+            ctx.lineWidth = isSelected ? 2.5 : 1.5;
+            ctx.fillStyle = isSelected ? 'rgba(108,123,255,0.15)' : 'rgba(15,17,23,0.8)';
+            if (s.type === 'rect') {
+              roundRect(ctx, s.x, s.y, s.w, s.h, 6);
+              ctx.fill(); ctx.stroke();
+            } else if (s.type === 'diamond') {
+              ctx.beginPath();
+              ctx.moveTo(s.x + s.w/2, s.y);
+              ctx.lineTo(s.x + s.w, s.y + s.h/2);
+              ctx.lineTo(s.x + s.w/2, s.y + s.h);
+              ctx.lineTo(s.x, s.y + s.h/2);
+              ctx.closePath();
+              ctx.fill(); ctx.stroke();
+            } else if (s.type === 'oval') {
+              ctx.beginPath();
+              ctx.ellipse(s.x + s.w/2, s.y + s.h/2, s.w/2, s.h/2, 0, 0, Math.PI*2);
+              ctx.fill(); ctx.stroke();
+            } else if (s.type === 'parallelogram') {
+              const sk = s.h * 0.3;
+              ctx.beginPath();
+              ctx.moveTo(s.x + sk, s.y);
+              ctx.lineTo(s.x + s.w, s.y);
+              ctx.lineTo(s.x + s.w - sk, s.y + s.h);
+              ctx.lineTo(s.x, s.y + s.h);
+              ctx.closePath();
+              ctx.fill(); ctx.stroke();
+            } else if (s.type === 'declaration') {
+              // Hexagon (preparation)
+              const indent = s.w * 0.18;
+              ctx.beginPath();
+              ctx.moveTo(s.x + indent, s.y);
+              ctx.lineTo(s.x + s.w - indent, s.y);
+              ctx.lineTo(s.x + s.w, s.y + s.h/2);
+              ctx.lineTo(s.x + s.w - indent, s.y + s.h);
+              ctx.lineTo(s.x + indent, s.y + s.h);
+              ctx.lineTo(s.x, s.y + s.h/2);
+              ctx.closePath();
+              ctx.fill(); ctx.stroke();
+            }
+            if (s.text && s.id !== editingId) {
+              ctx.fillStyle = '#f0f2f8';
+              ctx.font = '13px Plus Jakarta Sans';
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'middle';
+              wrapText(ctx, s.text, s.x + s.w/2, s.y + s.h/2, s.w - 20, 16);
+            }
+          } else if (s.type === 'arrow') {
+            ctx.strokeStyle = isSelected ? '#6c7bff' : '#8b92a8';
+            ctx.lineWidth = isSelected ? 2.5 : 1.5;
+            ctx.beginPath();
+            ctx.moveTo(s.x1, s.y1);
+            ctx.lineTo(s.x2, s.y2);
+            ctx.stroke();
+            drawArrowhead(ctx, s.x1, s.y1, s.x2, s.y2);
+          } else if (s.type === 'text') {
+            ctx.fillStyle = isSelected ? '#6c7bff' : '#f0f2f8';
+            ctx.font = '14px Plus Jakarta Sans';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            if (s.id !== editingId) ctx.fillText(s.text || 'Teks', s.x, s.y);
+          }
+          ctx.restore();
+        });
+      }
+
+      function roundRect(ctx, x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x+r, y); ctx.lineTo(x+w-r, y);
+        ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+        ctx.lineTo(x+w, y+h-r); ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+        ctx.lineTo(x+r, y+h); ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+        ctx.lineTo(x, y+r); ctx.quadraticCurveTo(x, y, x+r, y);
+        ctx.closePath();
+      }
+
+      function wrapText(ctx, text, cx, cy, maxW, lineH) {
+        const words = text.split(' ');
+        let line = '', lines = [];
+        words.forEach(w => {
+          const test = line ? line + ' ' + w : w;
+          if (ctx.measureText(test).width > maxW && line) { lines.push(line); line = w; }
+          else line = test;
+        });
+        if (line) lines.push(line);
+        const totalH = lines.length * lineH;
+        lines.forEach((l, i) => ctx.fillText(l, cx, cy - totalH/2 + i * lineH + lineH/2));
+      }
+
+      function drawArrowhead(ctx, x1, y1, x2, y2) {
+        const angle = Math.atan2(y2-y1, x2-x1);
+        const size = 10;
+        ctx.fillStyle = ctx.strokeStyle;
+        ctx.beginPath();
+        ctx.moveTo(x2, y2);
+        ctx.lineTo(x2 - size*Math.cos(angle-0.4), y2 - size*Math.sin(angle-0.4));
+        ctx.lineTo(x2 - size*Math.cos(angle+0.4), y2 - size*Math.sin(angle+0.4));
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      function findShape(x, y) {
+        for (let i = shapes.length-1; i >= 0; i--) {
+          const s = shapes[i];
+          if (['rect','oval','parallelogram','declaration'].includes(s.type) && x>=s.x && x<=s.x+s.w && y>=s.y && y<=s.y+s.h) return s;
+          if (s.type === 'diamond') {
+            const cx=s.x+s.w/2, cy=s.y+s.h/2;
+            if (Math.abs(x-cx)/(s.w/2)+Math.abs(y-cy)/(s.h/2) <= 1) return s;
+          }
+          if (s.type === 'text' && x>=s.x && x<=s.x+120 && y>=s.y && y<=s.y+20) return s;
+        }
+        return null;
+      }
+
+      function onMouseDown(e) {
+        const pos = getPos(e);
+        if (tool === 'select') {
+          const s = findShape(pos.x, pos.y);
+          setSelectedId(s ? s.id : null);
+          if (s) setStartPos({ mx: pos.x, my: pos.y, sx: s.x !== undefined ? s.x : s.x1, sy: s.y !== undefined ? s.y : s.y1 });
+        } else if (tool === 'erase') {
+          const s = findShape(pos.x, pos.y);
+          if (s) setShapes(prev => prev.filter(x => x.id !== s.id));
+        } else if (tool === 'arrow') {
+          setArrowStart(pos);
+        } else if (tool === 'text') {
+          const newId = ++idRef.current;
+          setShapes(prev => [...prev, { id: newId, type: 'text', x: pos.x, y: pos.y, text: '' }]);
+          setEditingId(newId); setEditText('');
+        } else {
+          setDrawing(true); setStartPos(pos);
+        }
+      }
+
+      function onMouseMove(e) {
+        if (!drawing && !startPos) return;
+        const pos = getPos(e);
+        if (tool === 'select' && selectedId && startPos) {
+          setShapes(prev => prev.map(s => {
+            if (s.id !== selectedId) return s;
+            const dx = pos.x - startPos.mx, dy = pos.y - startPos.my;
+            if (s.type === 'arrow') return { ...s, x1: startPos.sx+dx, y1: startPos.sy+dy, x2: s.x2+(dx), y2: s.y2+(dy) };
+            return { ...s, x: startPos.sx+dx, y: startPos.sy+dy };
+          }));
+        }
+      }
+
+      function onMouseUp(e) {
+        const pos = getPos(e);
+        if (tool === 'arrow' && arrowStart) {
+          const newId = ++idRef.current;
+          setShapes(prev => [...prev, { id: newId, type: 'arrow', x1: arrowStart.x, y1: arrowStart.y, x2: pos.x, y2: pos.y }]);
+          setArrowStart(null);
+        } else if (drawing && startPos) {
+          const w = Math.abs(pos.x - startPos.x), h = Math.abs(pos.y - startPos.y);
+          if (w > 10 && h > 10) {
+            const newId = ++idRef.current;
+            const defaultText = { rect:'Proses', diamond:'Kondisi?', oval:'Start/End', parallelogram:'Input/Output', declaration:'Inisialisasi' };
+            setShapes(prev => [...prev, { id: newId, type: tool, x: Math.min(pos.x, startPos.x), y: Math.min(pos.y, startPos.y), w, h, text: defaultText[tool] || '' }]);
+          }
+        }
+        setDrawing(false); setStartPos(null);
+      }
+
+      function onDblClick(e) {
+        const pos = getPos(e);
+        const s = findShape(pos.x, pos.y);
+        if (s && s.type !== 'arrow') {
+          setEditingId(s.id); setEditText(s.text || '');
+        }
+      }
+
+      function commitEdit() {
+        setShapes(prev => prev.map(s => s.id === editingId ? { ...s, text: editText } : s));
+        setEditingId(null);
+      }
+
+      const tools = [
+        { id: 'select', label: '↖ Pilih' },
+        { id: 'oval', label: '⬭ Start/End' },
+        { id: 'rect', label: '□ Proses' },
+        { id: 'diamond', label: '◇ Keputusan' },
+        { id: 'parallelogram', label: '▱ Input/Output' },
+        { id: 'declaration', label: '⬡ Preparation' },
+        { id: 'text', label: 'T Teks' },
+        { id: 'arrow', label: '→ Panah' },
+        { id: 'erase', label: '✕ Hapus' },
+      ];
+
+      return (
+        <div>
+          <div className="fc-toolbar">
+            {tools.map(t => (
+              <button key={t.id} className={`fc-tool ${tool===t.id?'active':''}`} onClick={() => setTool(t.id)}>{t.label}</button>
+            ))}
+            <button className="fc-tool" style={{marginLeft:'auto'}} onClick={() => { setShapes([]); setSelectedId(null); }}>🗑 Kosongkan</button>
+          </div>
+          <div className="canvas-wrap">
+            <canvas
+              ref={canvasRef} width={900} height={480}
+              className="fc-canvas"
+              onMouseDown={onMouseDown} onMouseMove={onMouseMove} onMouseUp={onMouseUp}
+              onDoubleClick={onDblClick}
+              style={{ cursor: tool==='select'?'default':tool==='erase'?'crosshair':'crosshair' }}
+            />
+            {editingId && (
+              <div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', background:'var(--bg2)', border:'1px solid var(--accent)', borderRadius:8, padding:12, zIndex:10 }}>
+                <input
+                  autoFocus value={editText} onChange={e => setEditText(e.target.value)}
+                  onKeyDown={e => e.key==='Enter' && commitEdit()}
+                  style={{ width:200, fontSize:14 }}
+                  placeholder="Ketik label..."
+                />
+                <button className="btn btn-primary" style={{marginTop:8, width:'100%'}} onClick={commitEdit}>Simpan</button>
+              </div>
+            )}
+          </div>
+          <p style={{fontSize:12, color:'var(--text2)', marginTop:6}}>Klik drag untuk menggambar. Double-click untuk mengedit label. Pilih &gt; drag untuk memindahkan.</p>
+        </div>
+      );
+    }
+
+    // ─── Main App ────────────────────────────────────────────────────────────
+    function App() {
+      const [page, setPage] = useState('config');
+      const [config, setConfig] = useState(getConfig());
+      const [toast, setToast] = useState(null);
+      const [groups, setGroups] = useState([]);
+      const [results, setResults] = useState([]);
+      const [loading, setLoading] = useState(false);
+
+      const db = config.supabaseUrl && config.supabaseKey ? supabase(config.supabaseUrl, config.supabaseKey) : null;
+
+      function showToast(msg, dur=2500) {
+        setToast(msg);
+        setTimeout(() => setToast(null), dur);
+      }
+
+      useEffect(() => {
+        if (db && page === 'daftar') loadGroups();
+        if (db && page === 'nilai') loadResults();
+      }, [page]);
+
+      async function loadGroups() {
+        setLoading(true);
+        try {
+          const data = await db.from('groups').select('*');
+          setGroups(Array.isArray(data) ? data : []);
+        } catch { showToast('Gagal memuat data kelompok'); }
+        setLoading(false);
+      }
+
+      async function loadResults() {
+        setLoading(true);
+        try {
+          const data = await db.from('results').select('*');
+          setResults(Array.isArray(data) ? data : []);
+        } catch { showToast('Gagal memuat nilai'); }
+        setLoading(false);
+      }
+
+      return (
+        <div className="app">
+          <aside className="sidebar">
+            <div className="logo">Algo<span>Assess</span></div>
+            <span className="nav-section">Utama</span>
+            {[
+              { id:'mahasiswa', icon:'👨‍💻', label:'Halaman Mahasiswa' },
+              { id:'undi', icon:'🎲', label:'Undian Presentasi' },
+            ].map(n => (
+              <button key={n.id} className={`nav-item ${page===n.id?'active':''}`} onClick={()=>setPage(n.id)}>
+                <span>{n.icon}</span>{n.label}
+              </button>
+            ))}
+            <span className="nav-section">Dosen</span>
+            {[
+              { id:'daftar', icon:'📋', label:'Data Kelompok' },
+              { id:'nilai', icon:'📊', label:'Rekap Nilai' },
+              { id:'config', icon:'⚙️', label:'Konfigurasi' },
+            ].map(n => (
+              <button key={n.id} className={`nav-item ${page===n.id?'active':''}`} onClick={()=>setPage(n.id)}>
+                <span>{n.icon}</span>{n.label}
+              </button>
+            ))}
+            <div style={{marginTop:'auto', padding:'1rem 12px', fontSize:12, color:'var(--text2)'}}>
+              Algoritma &amp; Pemrograman<br/>
+              <span style={{color:'var(--success)'}}>●</span> {config.supabaseUrl ? 'DB Terhubung' : 'DB Belum Dikonfigurasi'}
+            </div>
+          </aside>
+
+          <main className="main">
+            {page === 'config' && <ConfigPage config={config} setConfig={c => { setConfig(c); saveConfig(c); showToast('Konfigurasi disimpan ✓'); }} />}
+            {page === 'mahasiswa' && <MahasiswaPage db={db} config={config} showToast={showToast} />}
+            {page === 'undi' && <UndiPage db={db} config={config} showToast={showToast} />}
+            {page === 'daftar' && <DaftarPage groups={groups} loading={loading} onRefresh={loadGroups} db={db} showToast={showToast} />}
+            {page === 'nilai' && <NilaiPage results={results} loading={loading} onRefresh={loadResults} />}
+          </main>
+
+          {toast && <div className="toast">{toast}</div>}
+        </div>
+      );
+    }
+
+    // ─── Config Page ─────────────────────────────────────────────────────────
+    function ConfigPage({ config, setConfig }) {
+      const [form, setForm] = useState(config);
+      function save() { setConfig(form); }
+      return (
+        <div>
+          <div className="section-header">
+            <div className="section-title">Konfigurasi</div>
+            <div className="section-sub">Masukkan API key dan URL database</div>
+          </div>
+          <div className="card" style={{maxWidth:600}}>
+            <div className="card-title">🔑 API Keys</div>
+            <div className="info-box">
+              Lihat panduan deployment di bawah untuk cara mendapatkan key ini. Key disimpan di browser Anda, tidak dikirim ke server lain.
+            </div>
+            <div className="form-group">
+              <label>Supabase URL</label>
+              <input value={form.supabaseUrl||''} onChange={e=>setForm({...form,supabaseUrl:e.target.value})} placeholder="https://xxxxx.supabase.co" />
+              <p className="config-hint">Dari Supabase dashboard → Project Settings → API → Project URL</p>
+            </div>
+            <div className="form-group">
+              <label>Supabase Anon Key</label>
+              <input value={form.supabaseKey||''} onChange={e=>setForm({...form,supabaseKey:e.target.value})} placeholder="eyJhbGci..." type="password" />
+              <p className="config-hint">Dari Supabase → Project Settings → API → <code>anon public</code> key</p>
+            </div>
+            <div className="form-group">
+              <label>Anthropic API Key</label>
+              <input value={form.anthropicKey||''} onChange={e=>setForm({...form,anthropicKey:e.target.value})} placeholder="sk-ant-..." type="password" />
+              <p className="config-hint">Dari <code>console.anthropic.com</code> → API Keys → Create Key</p>
+            </div>
+            <div className="form-group">
+              <label>Nama Kelas / Semester (opsional)</label>
+              <input value={form.kelas||''} onChange={e=>setForm({...form,kelas:e.target.value})} placeholder="Cth: Kelas A - Semester 1 2025" />
+            </div>
+            <button className="btn btn-primary" onClick={save}>Simpan Konfigurasi</button>
+          </div>
+
+          <div className="card" style={{maxWidth:600, marginTop:'1.5rem'}}>
+            <div className="card-title">🗄️ Setup Database Supabase</div>
+            <p style={{fontSize:13, color:'var(--text2)', marginBottom:'1rem'}}>Jalankan SQL ini sekali di Supabase SQL Editor (Database → SQL Editor → New Query):</p>
+            <pre style={{background:'var(--bg3)', padding:'1rem', borderRadius:8, fontSize:12, color:'var(--text2)', overflowX:'auto', lineHeight:1.6}}>{`create table if not exists groups (
+  id uuid default gen_random_uuid() primary key,
+  kelompok text,
+  anggota text[],
+  topik text,
+  kode text,
+  flowchart jsonb,
+  created_at timestamptz default now()
+);
+
+create table if not exists results (
+  id uuid default gen_random_uuid() primary key,
+  group_id uuid references groups(id),
+  kelompok text,
+  perwakilan text,
+  pertanyaan jsonb,
+  jawaban jsonb,
+  nilai integer,
+  feedback text,
+  created_at timestamptz default now()
+);`}</pre>
+            <p style={{fontSize:12, color:'var(--text2)', marginTop:'0.75rem'}}>Setelah itu, aktifkan RLS atau set policy public untuk development (lihat README deployment).</p>
+          </div>
+        </div>
+      );
+    }
+
+    // ─── Mahasiswa Page ──────────────────────────────────────────────────────
+    function MahasiswaPage({ db, config, showToast }) {
+      const [step, setStep] = useState(0); // 0=isi data, 1=flowchart, 2=kode, 3=selesai
+      const [form, setForm] = useState({ kelompok:'', anggota:['','',''], topik:'' });
+      const [shapes, setShapes] = useState([]);
+      const [kode, setKode] = useState('');
+      const [saving, setSaving] = useState(false);
+
+      const steps = ['Data Kelompok', 'Flowchart', 'Kode Program', 'Selesai'];
+
+      async function submit() {
+        if (!db) { showToast('Database belum dikonfigurasi di halaman Konfigurasi'); return; }
+        setSaving(true);
+        try {
+          await db.from('groups').insert({
+            kelompok: form.kelompok,
+            anggota: form.anggota.filter(Boolean),
+            topik: form.topik,
+            kode: kode,
+            flowchart: shapes
+          });
+          setStep(3);
+          showToast('Berhasil disimpan! ✓');
+        } catch { showToast('Gagal menyimpan, coba lagi'); }
+        setSaving(false);
+      }
+
+      const canNext = () => {
+        if (step === 0) return form.kelompok && form.anggota.filter(Boolean).length === 3 && form.topik;
+        if (step === 1) return shapes.length > 0;
+        if (step === 2) return kode.trim().length > 10;
+        return false;
+      };
+
+      return (
+        <div>
+          <div className="section-header">
+            <div className="section-title">Pengumpulan Tugas</div>
+            <div className="section-sub">Algoritma &amp; Pemrograman {config.kelas ? `— ${config.kelas}` : ''}</div>
+          </div>
+
+          <div className="steps">
+            {steps.map((s, i) => (
+              <div key={i} className={`step ${i===step?'active':i<step?'done':''}`}>
+                <div className={`step-dot ${i===step?'active':i<step?'done':'pending'}`}>
+                  {i < step ? '✓' : i+1}
+                </div>
+                <div className="step-label">{s}</div>
+              </div>
+            ))}
+          </div>
+
+          {step === 0 && (
+            <div className="card" style={{maxWidth:600}}>
+              <div className="card-title">📝 Data Kelompok</div>
+              <div className="form-group">
+                <label>Nama Kelompok</label>
+                <input value={form.kelompok} onChange={e=>setForm({...form,kelompok:e.target.value})} placeholder="Cth: Kelompok 1" />
+              </div>
+              <div className="form-group">
+                <label>Topik / Judul Program</label>
+                <input value={form.topik} onChange={e=>setForm({...form,topik:e.target.value})} placeholder="Cth: Program Kalkulator Sederhana" />
+              </div>
+              {[0,1,2].map(i => (
+                <div className="form-group" key={i}>
+                  <label>Anggota {i+1}</label>
+                  <input value={form.anggota[i]} onChange={e=>{ const a=[...form.anggota]; a[i]=e.target.value; setForm({...form,anggota:a}); }} placeholder={`Nama lengkap anggota ${i+1}`} />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {step === 1 && (
+            <div className="card">
+              <div className="card-title">📊 Flowchart Program</div>
+              <div className="info-box">
+                Gambar flowchart program Anda. Gunakan <strong>□ Proses</strong> untuk langkah, <strong>◇ Keputusan</strong> untuk kondisi, <strong>→ Panah</strong> untuk alur. Double-click shape untuk mengedit label.
+              </div>
+              <FlowchartEditor value={shapes} onChange={setShapes} />
+            </div>
+          )}
+
+          {step === 2 && (
+            <div className="card">
+              <div className="card-title">💻 Kode Program</div>
+              <div className="form-group">
+                <label>Topik: {form.topik}</label>
+                <textarea
+                  className="code-input"
+                  value={kode}
+                  onChange={e=>setKode(e.target.value)}
+                  placeholder="// Ketik kode program Anda di sini..."
+                  style={{minHeight:320}}
+                />
+              </div>
+            </div>
+          )}
+
+          {step === 3 && (
+            <div className="card" style={{maxWidth:500, textAlign:'center'}}>
+              <div style={{fontSize:48, marginBottom:'1rem'}}>✅</div>
+              <div style={{fontSize:20, fontWeight:700, marginBottom:0.5+'rem'}}>Berhasil Dikumpulkan!</div>
+              <p style={{color:'var(--text2)', fontSize:14}}>Tugas kelompok <strong style={{color:'var(--text)'}}>{form.kelompok}</strong> telah tersimpan. Tunggu instruksi dosen untuk undian presentasi.</p>
+            </div>
+          )}
+
+          {step < 3 && (
+            <div style={{display:'flex', gap:12, marginTop:'1.5rem'}}>
+              {step > 0 && <button className="btn btn-secondary" onClick={()=>setStep(s=>s-1)}>← Kembali</button>}
+              {step < 2
+                ? <button className="btn btn-primary" onClick={()=>setStep(s=>s+1)} disabled={!canNext()}>Lanjut →</button>
+                : <button className="btn btn-primary" onClick={submit} disabled={saving||!canNext()}>{saving?<><span className="spinner"></span> Menyimpan...</>:'📤 Kumpulkan Tugas'}</button>
+              }
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // ─── Undi Page ───────────────────────────────────────────────────────────
+    function UndiPage({ db, config, showToast }) {
+      const [groups, setGroups] = useState([]);
+      const [selected, setSelected] = useState(null);
+      const [winner, setWinner] = useState(null);
+      const [shaking, setShaking] = useState(false);
+      const [qaState, setQaState] = useState('idle'); // idle, loading, ready, answering, done
+      const [questions, setQuestions] = useState([]);
+      const [answers, setAnswers] = useState({});
+      const [grading, setGrading] = useState(false);
+      const [score, setScore] = useState(null);
+      const [feedback, setFeedback] = useState('');
+
+      useEffect(() => {
+        if (db) loadGroups();
+      }, []);
+
+      async function loadGroups() {
+        const data = await db.from('groups').select('*');
+        setGroups(Array.isArray(data) ? data : []);
+      }
+
+      function undi() {
+        if (!selected) return;
+        const grp = groups.find(g => g.id === selected);
+        if (!grp) return;
+        setShaking(true); setWinner(null);
+        setTimeout(() => {
+          const members = grp.anggota || [];
+          const pick = members[Math.floor(Math.random() * members.length)];
+          setWinner(pick); setShaking(false);
+          setQaState('idle'); setQuestions([]); setAnswers({}); setScore(null);
+        }, 1800);
+      }
+
+      async function generateQuestions() {
+        if (!config.anthropicKey) { showToast('Anthropic API key belum diatur di Konfigurasi'); return; }
+        const grp = groups.find(g => g.id === selected);
+        setQaState('loading');
+        try {
+          const prompt = `Kamu adalah dosen mata kuliah Algoritma dan Pemrograman. Kelompok mahasiswa telah membuat program dengan topik: "${grp.topik}".
+
+Kode program mereka:
+\`\`\`
+${grp.kode}
+\`\`\`
+
+Buat TEPAT 3 pertanyaan tanya jawab lisan untuk mahasiswa bernama ${winner}. Pertanyaan harus:
+1. Spesifik berdasarkan kode yang mereka tulis (bukan pertanyaan umum)
+2. Menguji pemahaman logika dan keputusan yang dibuat dalam kode
+3. Bervariasi: satu pertanyaan konsep, satu analisis, satu skenario "bagaimana jika"
+
+Jawab HANYA dalam JSON array, tidak ada teks lain:
+[{"pertanyaan": "...", "poin_kunci": "..."},{"pertanyaan": "...", "poin_kunci": "..."},{"pertanyaan": "...", "poin_kunci": "..."}]`;
+
+          const res = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-api-key': config.anthropicKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+            body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, messages: [{ role: 'user', content: prompt }] })
+          });
+          const data = await res.json();
+          const text = data.content[0].text;
+          const clean = text.replace(/```json|```/g, '').trim();
+          setQuestions(JSON.parse(clean));
+          setQaState('answering');
+        } catch(e) { showToast('Gagal generate pertanyaan: ' + e.message); setQaState('idle'); }
+      }
+
+      async function submitAnswers() {
+        if (!config.anthropicKey) return;
+        const grp = groups.find(g => g.id === selected);
+        setGrading(true);
+        try {
+          const qaText = questions.map((q,i) => `Q${i+1}: ${q.pertanyaan}\nPoin kunci: ${q.poin_kunci}\nJawaban mahasiswa: ${answers[i]||'(tidak dijawab)'}`).join('\n\n');
+          const prompt = `Kamu adalah dosen Algoritma dan Pemrograman yang menilai jawaban tanya jawab lisan mahasiswa.
+
+Kode program (topik: ${grp.topik}):
+${grp.kode}
+
+Tanya jawab:
+${qaText}
+
+Berikan penilaian dalam JSON (tidak ada teks lain):
+{"nilai": <0-100>, "feedback": "<umpan balik singkat 2-3 kalimat dalam bahasa Indonesia, spesifik tentang pemahaman yang ditunjukkan>"}`;
+
+          const res = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-api-key': config.anthropicKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+            body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 500, messages: [{ role: 'user', content: prompt }] })
+          });
+          const data = await res.json();
+          const text = data.content[0].text.replace(/```json|```/g, '').trim();
+          const parsed = JSON.parse(text);
+          setScore(parsed.nilai); setFeedback(parsed.feedback);
+          setQaState('done');
+
+          // Save to DB
+          if (db) {
+            await db.from('results').insert({
+              group_id: grp.id,
+              kelompok: grp.kelompok,
+              perwakilan: winner,
+              pertanyaan: questions,
+              jawaban: answers,
+              nilai: parsed.nilai,
+              feedback: parsed.feedback
+            });
+          }
+          showToast('Nilai berhasil disimpan ✓');
+        } catch(e) { showToast('Gagal menilai: ' + e.message); }
+        setGrading(false);
+      }
+
+      const grp = groups.find(g => g.id === selected);
+
+      return (
+        <div>
+          <div className="section-header">
+            <div className="section-title">🎲 Undian & Tanya Jawab</div>
+            <div className="section-sub">Undian perwakilan kelompok dan sesi tanya jawab</div>
+          </div>
+
+          <div className="grid-2" style={{alignItems:'start'}}>
+            <div className="card">
+              <div className="card-title">Pilih Kelompok</div>
+              {groups.length === 0
+                ? <div style={{color:'var(--text2)', fontSize:14}}>Belum ada kelompok. Minta mahasiswa mengumpulkan tugas terlebih dahulu.</div>
+                : groups.map(g => (
+                  <button key={g.id} onClick={()=>{setSelected(g.id);setWinner(null);setQaState('idle');setScore(null);}}
+                    style={{display:'block', width:'100%', textAlign:'left', padding:'10px 12px', marginBottom:8, borderRadius:8,
+                      background: selected===g.id ? 'rgba(108,123,255,0.15)' : 'var(--bg3)',
+                      border: `1px solid ${selected===g.id?'var(--accent)':'var(--border2)'}`,
+                      color: selected===g.id ? 'var(--accent)' : 'var(--text)', cursor:'pointer', fontSize:14}}>
+                    <strong>{g.kelompok}</strong>
+                    <div style={{fontSize:12, color:'var(--text2)', marginTop:2}}>{(g.anggota||[]).join(', ')}</div>
+                    <div style={{fontSize:11, color:'var(--accent2)', marginTop:2}}>{g.topik}</div>
+                  </button>
+                ))
+              }
+              {groups.length > 0 && <button className="btn btn-secondary" style={{fontSize:12}} onClick={loadGroups}>↻ Refresh</button>}
+            </div>
+
+            <div>
+              <div className="card" style={{marginBottom:'1rem'}}>
+                <div className="card-title">Hasil Undian</div>
+                {!selected
+                  ? <p style={{color:'var(--text2)', fontSize:14}}>Pilih kelompok terlebih dahulu.</p>
+                  : <>
+                    <p style={{fontSize:13, color:'var(--text2)', marginBottom:'1rem'}}>Kelompok: <strong style={{color:'var(--text)'}}>{grp?.kelompok}</strong></p>
+                    <div style={{display:'flex', flexWrap:'wrap', gap:8, marginBottom:'1rem'}}>
+                      {(grp?.anggota||[]).map(m => (
+                        <div key={m} className={`member-chip ${winner===m?'winner':''} ${shaking&&winner===null?'shake':''}`}>{winner===m?'⭐ ':''}{m}</div>
+                      ))}
+                    </div>
+                    <button className="btn btn-primary" onClick={undi} disabled={shaking}>
+                      {shaking ? '🎲 Mengundi...' : winner ? '🔄 Undi Ulang' : '🎲 Mulai Undian'}
+                    </button>
+                  </>
+                }
+              </div>
+
+              {winner && qaState === 'idle' && (
+                <div className="card">
+                  <div style={{fontSize:14, marginBottom:'1rem'}}>Perwakilan terpilih: <strong style={{color:'var(--warning)'}}>{winner}</strong></div>
+                  <button className="btn btn-primary btn-lg" style={{width:'100%'}} onClick={generateQuestions}>
+                    ✨ Generate Pertanyaan AI
+                  </button>
+                  <p style={{fontSize:12, color:'var(--text2)', marginTop:8}}>AI akan membuat pertanyaan spesifik berdasarkan kode kelompok ini.</p>
+                </div>
+              )}
+
+              {qaState === 'loading' && (
+                <div className="card" style={{textAlign:'center', padding:'2rem'}}>
+                  <div className="spinner" style={{margin:'0 auto 1rem'}}></div>
+                  <p style={{color:'var(--text2)', fontSize:14}}>AI sedang membuat pertanyaan...</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {qaState === 'answering' && (
+            <div className="card" style={{marginTop:'1.5rem'}}>
+              <div className="card-title">💬 Sesi Tanya Jawab — {winner}</div>
+              <div className="info-box">Mahasiswa menjawab pertanyaan di bawah ini. Jawaban akan dinilai oleh AI.</div>
+              {questions.map((q, i) => (
+                <div className="qa-item" key={i}>
+                  <div className="qa-q">Pertanyaan {i+1}: {q.pertanyaan}</div>
+                  <textarea
+                    value={answers[i]||''}
+                    onChange={e=>setAnswers({...answers,[i]:e.target.value})}
+                    placeholder="Ketik jawaban di sini..."
+                    style={{minHeight:100}}
+                  />
+                </div>
+              ))}
+              <button className="btn btn-primary btn-lg" onClick={submitAnswers}
+                disabled={grading || Object.keys(answers).length < questions.length || Object.values(answers).some(a=>!a.trim())}>
+                {grading ? <><span className="spinner"></span> Menilai...</> : '📊 Submit & Nilai Otomatis'}
+              </button>
+            </div>
+          )}
+
+          {qaState === 'done' && score !== null && (
+            <div className="card" style={{marginTop:'1.5rem', textAlign:'center'}}>
+              <div className="card-title" style={{textAlign:'left'}}>📊 Hasil Penilaian</div>
+              <div style={{display:'flex', alignItems:'center', gap:'2rem', flexWrap:'wrap'}}>
+                <ScoreRing score={score} />
+                <div style={{flex:1, textAlign:'left'}}>
+                  <p style={{fontSize:14, marginBottom:6}}><strong>Perwakilan:</strong> {winner}</p>
+                  <p style={{fontSize:14, marginBottom:6}}><strong>Kelompok:</strong> {grp?.kelompok}</p>
+                  <p style={{fontSize:14, color:'var(--text2)', lineHeight:1.6}}>{feedback}</p>
+                  <div className="info-box" style={{marginTop:'1rem', marginBottom:0}}>
+                    ⚠️ Nilai ini adalah rekomendasi AI. Harap dosen mereview sebelum nilai final.
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    function ScoreRing({ score }) {
+      const r = 50, circ = 2 * Math.PI * r;
+      const pct = score / 100;
+      const color = score >= 80 ? '#34d399' : score >= 60 ? '#fbbf24' : '#f87171';
+      return (
+        <div className="score-ring" style={{width:130, height:130, flexShrink:0}}>
+          <svg width="130" height="130" viewBox="0 0 130 130">
+            <circle cx="65" cy="65" r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="10" />
+            <circle cx="65" cy="65" r={r} fill="none" stroke={color} strokeWidth="10"
+              strokeDasharray={circ} strokeDashoffset={circ * (1 - pct)}
+              strokeLinecap="round" style={{transition:'stroke-dashoffset 1s ease'}} />
+          </svg>
+          <div className="score-text">
+            <div className="num" style={{color}}>{score}</div>
+            <div className="lbl">/ 100</div>
+          </div>
+        </div>
+      );
+    }
+
+    // ─── Daftar Page ─────────────────────────────────────────────────────────
+    function DaftarPage({ groups, loading, onRefresh, db, showToast }) {
+      async function hapus(id) {
+        if (!confirm('Hapus kelompok ini?')) return;
+        await db.from('groups').delete().eq('id', id);
+        showToast('Kelompok dihapus'); onRefresh();
+      }
+      return (
+        <div>
+          <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'1.5rem'}}>
+            <div className="section-title">📋 Data Kelompok</div>
+            <button className="btn btn-secondary" onClick={onRefresh}>↻ Refresh</button>
+          </div>
+          {loading ? <div style={{textAlign:'center',padding:'3rem',color:'var(--text2)'}}>Memuat...</div>
+          : groups.length === 0 ? <div className="empty-state"><div className="empty-icon">📭</div><p>Belum ada kelompok yang mengumpulkan tugas</p></div>
+          : (
+            <div className="card">
+              <table>
+                <thead>
+                  <tr><th>Kelompok</th><th>Anggota</th><th>Topik</th><th>Waktu</th><th></th></tr>
+                </thead>
+                <tbody>
+                  {groups.map(g => (
+                    <tr key={g.id}>
+                      <td><strong>{g.kelompok}</strong></td>
+                      <td style={{fontSize:13}}>{(g.anggota||[]).join(', ')}</td>
+                      <td style={{fontSize:13, color:'var(--text2)'}}>{g.topik}</td>
+                      <td style={{fontSize:12, color:'var(--text2)'}}>{new Date(g.created_at).toLocaleDateString('id')}</td>
+                      <td><button className="btn btn-danger" style={{padding:'4px 10px', fontSize:12}} onClick={()=>hapus(g.id)}>Hapus</button></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // ─── Nilai Page ──────────────────────────────────────────────────────────
+    function NilaiPage({ results, loading, onRefresh }) {
+      const avg = results.length ? Math.round(results.reduce((a,r)=>a+(r.nilai||0),0)/results.length) : 0;
+      return (
+        <div>
+          <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'1.5rem'}}>
+            <div className="section-title">📊 Rekap Nilai</div>
+            <button className="btn btn-secondary" onClick={onRefresh}>↻ Refresh</button>
+          </div>
+          {results.length > 0 && (
+            <div className="grid-3" style={{marginBottom:'1.5rem'}}>
+              <div className="card" style={{textAlign:'center'}}>
+                <div style={{fontSize:32, fontWeight:700, color:'var(--accent)'}}>{results.length}</div>
+                <div style={{fontSize:13, color:'var(--text2)'}}>Kelompok Dinilai</div>
+              </div>
+              <div className="card" style={{textAlign:'center'}}>
+                <div style={{fontSize:32, fontWeight:700, color: avg>=75?'var(--success)':avg>=60?'var(--warning)':'var(--danger)'}}>{avg}</div>
+                <div style={{fontSize:13, color:'var(--text2)'}}>Rata-rata Nilai</div>
+              </div>
+              <div className="card" style={{textAlign:'center'}}>
+                <div style={{fontSize:32, fontWeight:700, color:'var(--success)'}}>{results.filter(r=>r.nilai>=75).length}</div>
+                <div style={{fontSize:13, color:'var(--text2)'}}>Nilai ≥ 75</div>
+              </div>
+            </div>
+          )}
+          {loading ? <div style={{textAlign:'center',padding:'3rem',color:'var(--text2)'}}>Memuat...</div>
+          : results.length === 0 ? <div className="empty-state"><div className="empty-icon">📉</div><p>Belum ada nilai tersimpan</p></div>
+          : (
+            <div className="card">
+              <table>
+                <thead>
+                  <tr><th>Kelompok</th><th>Perwakilan</th><th>Nilai AI</th><th>Feedback</th><th>Tanggal</th></tr>
+                </thead>
+                <tbody>
+                  {results.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).map(r => (
+                    <tr key={r.id}>
+                      <td><strong>{r.kelompok}</strong></td>
+                      <td style={{fontSize:13}}>{r.perwakilan}</td>
+                      <td>
+                        <span className={`badge ${r.nilai>=80?'badge-green':r.nilai>=60?'badge-yellow':'badge-red'}`}>{r.nilai}</span>
+                      </td>
+                      <td style={{fontSize:12, color:'var(--text2)', maxWidth:300}}>{r.feedback}</td>
+                      <td style={{fontSize:12, color:'var(--text2)'}}>{new Date(r.created_at).toLocaleDateString('id')}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+</body>
+</html>
