@@ -234,16 +234,21 @@
 
     // ─── Supabase tiny client ───────────────────────────────────────────────
     function supabase(url, key) {
-      const headers = { 'apikey': key, 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
+      // Support both legacy anon key (eyJ...) and new publishable key (sb_publishable_...)
+      const isNewKey = key.startsWith('sb_publishable_') || key.startsWith('sb_secret_');
+      const headers = isNewKey
+        ? { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' }
+        : { 'apikey': key, 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
+      const baseUrl = url.replace(/\/rest\/v1\/?$/, '');
       return {
         from: (table) => ({
-          select: (cols='*') => fetch(`${url}/rest/v1/${table}?select=${cols}`, { headers }).then(r => r.json()),
-          insert: (data) => fetch(`${url}/rest/v1/${table}`, { method: 'POST', headers, body: JSON.stringify(data) }).then(r => r.json()),
+          select: (cols='*') => fetch(`${baseUrl}/rest/v1/${table}?select=${cols}`, { headers }).then(r => r.json()),
+          insert: (data) => fetch(`${baseUrl}/rest/v1/${table}`, { method: 'POST', headers, body: JSON.stringify(data) }).then(r => r.json()),
           update: (data) => ({
-            eq: (col, val) => fetch(`${url}/rest/v1/${table}?${col}=eq.${val}`, { method: 'PATCH', headers, body: JSON.stringify(data) }).then(r => r.json())
+            eq: (col, val) => fetch(`${baseUrl}/rest/v1/${table}?${col}=eq.${val}`, { method: 'PATCH', headers, body: JSON.stringify(data) }).then(r => r.json())
           }),
           delete: () => ({
-            eq: (col, val) => fetch(`${url}/rest/v1/${table}?${col}=eq.${val}`, { method: 'DELETE', headers }).then(r => r.json())
+            eq: (col, val) => fetch(`${baseUrl}/rest/v1/${table}?${col}=eq.${val}`, { method: 'DELETE', headers }).then(r => r.json())
           }),
         })
       };
@@ -630,12 +635,12 @@
             <div className="form-group">
               <label>Supabase Anon Key</label>
               <input value={form.supabaseKey||''} onChange={e=>setForm({...form,supabaseKey:e.target.value})} placeholder="eyJhbGci..." type="password" />
-              <p className="config-hint">Dari Supabase → Project Settings → API → <code>anon public</code> key</p>
+              <p className="config-hint">Dari Supabase → Settings → <strong>API Keys</strong> → salin <code>Publishable key</code> (sb_publishable_...)</p>
             </div>
             <div className="form-group">
-              <label>Anthropic API Key</label>
-              <input value={form.anthropicKey||''} onChange={e=>setForm({...form,anthropicKey:e.target.value})} placeholder="sk-ant-..." type="password" />
-              <p className="config-hint">Dari <code>console.anthropic.com</code> → API Keys → Create Key</p>
+              <label>Google Gemini API Key</label>
+              <input value={form.anthropicKey||''} onChange={e=>setForm({...form,anthropicKey:e.target.value})} placeholder="AIza..." type="password" />
+              <p className="config-hint">Dari <code>aistudio.google.com</code> → Get API key → Create API key</p>
             </div>
             <div className="form-group">
               <label>Nama Kelas / Semester (opsional)</label>
@@ -829,7 +834,7 @@ create table if not exists results (
       }
 
       async function generateQuestions() {
-        if (!config.anthropicKey) { showToast('Anthropic API key belum diatur di Konfigurasi'); return; }
+        if (!config.anthropicKey) { showToast('Gemini API key belum diatur di Konfigurasi'); return; }
         const grp = groups.find(g => g.id === selected);
         setQaState('loading');
         try {
@@ -848,17 +853,17 @@ Buat TEPAT 3 pertanyaan tanya jawab lisan untuk mahasiswa bernama ${winner}. Per
 Jawab HANYA dalam JSON array, tidak ada teks lain:
 [{"pertanyaan": "...", "poin_kunci": "..."},{"pertanyaan": "...", "poin_kunci": "..."},{"pertanyaan": "...", "poin_kunci": "..."}]`;
 
-          const res = await fetch('https://api.anthropic.com/v1/messages', {
+          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${config.anthropicKey}`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'x-api-key': config.anthropicKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-            body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, messages: [{ role: 'user', content: prompt }] })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
           });
           const data = await res.json();
-          const text = data.content[0].text;
+          const text = data.candidates[0].content.parts[0].text;
           const clean = text.replace(/```json|```/g, '').trim();
           setQuestions(JSON.parse(clean));
           setQaState('answering');
-        } catch(e) { showToast('Gagal generate pertanyaan: ' + e.message); setQaState('idle'); }
+        } catch(e) { showToast('Gagal generate pertanyaan: ' + (e.message||JSON.stringify(data))); setQaState('idle'); }
       }
 
       async function submitAnswers() {
@@ -878,13 +883,13 @@ ${qaText}
 Berikan penilaian dalam JSON (tidak ada teks lain):
 {"nilai": <0-100>, "feedback": "<umpan balik singkat 2-3 kalimat dalam bahasa Indonesia, spesifik tentang pemahaman yang ditunjukkan>"}`;
 
-          const res = await fetch('https://api.anthropic.com/v1/messages', {
+          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${config.anthropicKey}`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'x-api-key': config.anthropicKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-            body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 500, messages: [{ role: 'user', content: prompt }] })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
           });
           const data = await res.json();
-          const text = data.content[0].text.replace(/```json|```/g, '').trim();
+          const text = data.candidates[0].content.parts[0].text.replace(/```json|```/g, '').trim();
           const parsed = JSON.parse(text);
           setScore(parsed.nilai); setFeedback(parsed.feedback);
           setQaState('done');
