@@ -255,8 +255,15 @@
     }
 
     // ─── Config storage ─────────────────────────────────────────────────────
+    const DEFAULT_CONFIG = {
+      supabaseUrl: 'https://ezimwfpadnfzphapdejm.supabase.co',
+      supabaseKey: 'sb_publishable_8F9vM_qyqpidV-M5fRAwMA_lGyAGZN9',
+    };
     function getConfig() {
-      try { return JSON.parse(localStorage.getItem('algo_config') || '{}'); } catch { return {}; }
+      try {
+        const saved = JSON.parse(localStorage.getItem('algo_config') || '{}');
+        return { ...DEFAULT_CONFIG, ...saved };
+      } catch { return DEFAULT_CONFIG; }
     }
     function saveConfig(c) { localStorage.setItem('algo_config', JSON.stringify(c)); }
 
